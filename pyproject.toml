@@ -10,6 +10,20 @@ packages = [{include = "jso_backend", from = "src"}]
 python = "^3.11"
 
 
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+isort = "^5.12.0"
+flake8 = "^6.0.0"
+pyright = "^1.1.315"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = 'black'
+
+[tool.black]
+line-length = 120
+
+
