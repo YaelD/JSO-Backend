@@ -9,7 +9,7 @@ packages = [{include = "jso_backend", from = "src"}]
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = {extras = ["all"], version = "^0.98.0"}
-
+sqlmodel = "^0.0.8"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
@@ -21,10 +21,23 @@ pyright = "^1.1.315"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.isort]
-profile = 'black'
-
 [tool.black]
-line-length = 120
+line-length = 99
+exclude = '''
+/(
+    \.git
+  | \.mypy_cache
+  | \.tox
+  | venv
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | \.vscode
+)/
+'''
 
-
+[tool.isort]
+# make it compatible with black
+profile = "black"

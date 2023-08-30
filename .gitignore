@@ -18,6 +18,7 @@ pip-log.txt
 .pytest_cache
 
 .DS_Store
+*.db
 .idea/*
 .python-version
 .vscode/*
