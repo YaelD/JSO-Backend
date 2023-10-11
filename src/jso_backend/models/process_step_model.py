@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel  # type:ignore
 
-from jso_backend.common.step_type import StepType
+from jso_backend.domain.step_type import StepType
 
 if TYPE_CHECKING:
     from .job_model import DBJobModel
