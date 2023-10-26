@@ -26,4 +26,3 @@ class JobEntity:
         self.about = about
         self.tech_stack = tech_stack
         self.process_steps = process_steps
-        self.curr_step = self.process_steps.curr_step.name
