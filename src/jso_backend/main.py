@@ -2,7 +2,6 @@ from fastapi import FastAPI
 
 from jso_backend.api.routers import job_router
 from jso_backend.data_access.database_manager import DatabaseManager
-from jso_backend.models.process_step_model import DBProcessStepModel
 
 app = FastAPI()
 
