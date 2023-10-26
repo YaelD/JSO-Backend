@@ -1,3 +1,4 @@
+from jso_backend.api.converters.process_steps_converter import ProcessStepConverter
 from jso_backend.api.models.job_api_model import JobReceive, JobSend
 from jso_backend.domain.job_entity import JobEntity
 
@@ -24,6 +25,7 @@ class JobConverter:
             about=job_entity.about,
             tech_stack=job_entity.tech_stack,
             id=job_entity.id,  # type: ignore
-            curr_step_name=job_entity.curr_step,
-            curr_step_order=job_entity.process_steps.curr_step_order,
+            process_steps=ProcessStepConverter().convert_process_step_entity_to_process_step_api(
+                job_entity.process_steps.process_steps
+            ),
         )
