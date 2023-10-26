@@ -1,39 +1,63 @@
 from typing import Any
 
+from jso_backend.business_logic.validators.process_steps_validator import (
+    ProcessStepsValidator,
+)
+from jso_backend.domain.exceptions.invalid_job_details_exception import (
+    InvalidJobDetailsError,
+)
 from jso_backend.domain.job_entity import JobEntity
+from jso_backend.domain.job_process import JobProcess
 from jso_backend.domain.job_status_type import JobStatus
 
 
 class JobValidator:
-    def validate_and_update_job_data_fields(
-        self, job_entity: JobEntity, job_details_to_update: dict[Any, Any]
+    def __init__(
+        self,
+        job_entity: JobEntity,
+        job_details_to_update: dict[Any, Any],
+        job_process: JobProcess | None = None,
     ) -> None:
-        self.validate_role_and_company_name(
-            job_entity=job_entity, job_details=job_details_to_update
-        )
-        status: JobStatus | None = job_details_to_update.get("status")
-        if status:
-            updated_value: JobStatus = self.validate_status(job_entity=job_entity, value=status)
-            job_details_to_update["status"] = updated_value
+        self.job_entity = job_entity
+        self.job_details_to_update = job_details_to_update
+        self.job_process = job_process
 
-    def validate_role_and_company_name(
-        self, job_entity: JobEntity, job_details: dict[str, Any]
+    def validate_job_data_fields(
+        self,
     ) -> None:
-        company_name: str | None = job_details.get("company_name")
-        if company_name and company_name == "":
-            job_details["company_name"] = job_entity.company_name
-        role: str | None = job_details.get("role")
-        if role and role == "":
-            job_details["role"] = job_entity.role
+        self.validate_required_field_is_not_empty("company_name")
+        self.validate_required_field_is_not_empty("role")
+        if self.job_process:
+            if not ProcessStepsValidator().check_is_valid_process_step_list(
+                job_process=self.job_process
+            ):
+                raise InvalidJobDetailsError(message="Invalid process steps")
+        status: JobStatus | None = self.job_details_to_update.get("status")
+        if status and not self.validate_status(value=status):
+            raise InvalidJobDetailsError(message="Invalid status type")
 
-    def validate_status(self, job_entity: JobEntity, value: JobStatus) -> JobStatus:
-        if value is JobStatus.CLOSE:
-            return value
-        elif value is JobStatus.OPEN:
-            return (
-                JobStatus.OPEN
-                if job_entity.process_steps.process_steps[2].is_completed
-                else JobStatus.PENDING
-            )
-        else:  # value is JobStatus.Pending
-            return job_entity.status
+    def validate_required_field_is_not_empty(self, field: str):
+        required_field: str | None = self.job_details_to_update.get(field)
+        if required_field is not None and required_field == "":
+            raise InvalidJobDetailsError(message=f"Invalid {field}. {field} can not be empty")
+
+    def validate_status(self, value: JobStatus) -> bool:
+        match value:
+            case JobStatus.CLOSE:
+                return True
+
+            case JobStatus.OPEN:
+                if self.job_process:
+                    return True if self.job_process.process_steps[2].is_completed else False
+                else:
+                    return (
+                        True
+                        if self.job_entity.process_steps.process_steps[2].is_completed
+                        else False
+                    )
+
+            case JobStatus.PENDING:
+                if self.job_process:
+                    return True if not self.job_process.process_steps[2].is_completed else False
+                else:
+                    return True if self.job_entity.status == JobStatus.PENDING else False

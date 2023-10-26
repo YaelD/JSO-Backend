@@ -1,10 +1,15 @@
 from fastapi import APIRouter, HTTPException
 
 from jso_backend.api.converters.job_converter import JobConverter
+from jso_backend.api.converters.process_steps_converter import ProcessStepConverter
 from jso_backend.api.models.job_api_model import JobReceive, JobSend, JobUpdate
 from jso_backend.business_logic.services.job_service import JobService
+from jso_backend.domain.exceptions.invalid_job_details_exception import (
+    InvalidJobDetailsError,
+)
 from jso_backend.domain.exceptions.job_not_found_exception import JobNotFoundError
 from jso_backend.domain.job_entity import JobEntity
+from jso_backend.domain.job_process import JobProcess
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 
@@ -12,8 +17,7 @@ router = APIRouter(prefix="/jobs", tags=["jobs"])
 @router.get("/", response_model=list[JobSend])
 async def get_list_of_jobs():
     all_jobs: list[JobEntity] = await JobService().get_all_jobs()
-    job_converter: JobConverter = JobConverter()
-    jobs: map[JobSend] = map(lambda job: job_converter.from_job_entity_to_job_api(job), all_jobs)
+    jobs: map[JobSend] = map(lambda job: JobConverter().from_job_entity_to_job_api(job), all_jobs)
     return list(jobs)
 
 
@@ -38,13 +42,20 @@ async def create_job(job: JobReceive):
 @router.patch("/{job_id}", response_model=JobSend)
 async def update_job(job_id: int, job: JobUpdate):
     try:
+        job_process: JobProcess | None = None
+        if job.process_steps is not None:
+            job_process = ProcessStepConverter().convert_dict_process_step_list_to_job_process(
+                job.process_steps
+            )
         updated_job: JobEntity = await JobService().update_job(
-            id=job_id, job_details=job.dict(exclude_unset=True)
+            id=job_id, job_details=job.dict(exclude_unset=True), job_process=job_process
         )
         job_send: JobSend = JobConverter().from_job_entity_to_job_api(updated_job)
         return job_send
     except JobNotFoundError as error:
         raise HTTPException(status_code=404, detail=error.message)
+    except InvalidJobDetailsError as error:
+        raise HTTPException(status_code=400, detail=error.message)
 
 
 @router.delete("/{job_id}")

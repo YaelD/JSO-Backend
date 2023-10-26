@@ -1,11 +1,13 @@
 from datetime import datetime
+from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, root_validator
 
+from jso_backend.api.models.process_step_api_model import ProcessStepApiModel
 from jso_backend.domain.job_status_type import JobStatus
 
 
-class JobReceive(BaseModel):
+class JobBase(BaseModel):
     creation_date: datetime | None = datetime.now()
     company_name: str
     role: str
@@ -15,10 +17,18 @@ class JobReceive(BaseModel):
     tech_stack: list[str] = []
 
 
-class JobSend(JobReceive):
+class JobReceive(JobBase):
+    @root_validator
+    def check_required_fields_are_not_empty_string(cls, values: dict[str, Any]) -> dict[str, Any]:
+        role, company_name = values.get("role"), values.get("company_name")
+        if role == "" or company_name == "":
+            raise ValueError("role and company_name filed can not be empty")
+        return values
+
+
+class JobSend(JobBase):
     id: int
-    curr_step_order: int = 0
-    curr_step_name: str = ""
+    process_steps: list[ProcessStepApiModel]
 
 
 class JobUpdate(BaseModel):
@@ -29,3 +39,4 @@ class JobUpdate(BaseModel):
     job_link: str | None = None
     about: str | None = None
     tech_stack: list[str] | None = None
+    process_steps: list[ProcessStepApiModel] | None = None
