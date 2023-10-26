@@ -3,8 +3,8 @@ from sqlmodel import Session, SQLModel, create_engine
 
 class DatabaseManager:
     _instance = None
-    _sqlite_file_name = "database.db"
-    _sqlite_url = f"sqlite:///{_sqlite_file_name}"
+    _password = "yd305110"
+    _postgreSQL_url = f"postgresql://postgres:{_password}@localhost:5432/postgres"
 
     def __new__(cls):
         if cls._instance is None:
@@ -13,9 +13,8 @@ class DatabaseManager:
         return cls._instance
 
     def init(self):
-        self.database_url = self._sqlite_url
-        connect_args = {"check_same_thread": False}
-        self.engine = create_engine(self.database_url, echo=True, connect_args=connect_args)
+        self.database_url = self._postgreSQL_url
+        self.engine = create_engine(self.database_url, echo=True)
 
     def create_db_and_tables(self):
         SQLModel.metadata.create_all(self.engine)
