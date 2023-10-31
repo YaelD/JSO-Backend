@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import Any
+from uuid import UUID
 
 from jso_backend.domain.job_entity import JobEntity
 
 
 class IJobDataAccess(ABC):
     @abstractmethod
-    async def get_job_by_id(self, job_id: int) -> JobEntity:
+    async def get_job_by_id(self, job_id: UUID) -> JobEntity:
         pass
 
     @abstractmethod
@@ -18,9 +19,9 @@ class IJobDataAccess(ABC):
         pass
 
     @abstractmethod
-    async def update_job(self, job_id: int, job_data: dict[str, Any]) -> JobEntity:
+    async def update_job(self, job_id: UUID, job_data: dict[str, Any]) -> JobEntity:
         pass
 
     @abstractmethod
-    def delete_job(self, job_id: int) -> None:
+    def delete_job(self, job_id: UUID) -> None:
         pass

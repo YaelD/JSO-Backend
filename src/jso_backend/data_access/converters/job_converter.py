@@ -36,5 +36,5 @@ class JobDBConverter:
             process_steps=ProcessStepDBConverter().convert_list_of_process_step_entity_to_list_of_dict(
                 job_process=job.process_steps
             ),
-            id=job.id if job.id else None,
+            id=job.id,
         )

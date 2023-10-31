@@ -1,4 +1,5 @@
 from typing import Any
+from uuid import UUID
 
 from jso_backend.business_logic.logic.job_logic import JobLogic
 from jso_backend.business_logic.validators.job_validator import JobValidator
@@ -9,7 +10,7 @@ from jso_backend.domain.job_process import JobProcess
 
 
 class JobService:
-    async def get_job_by_id(self, id: int) -> JobEntity:
+    async def get_job_by_id(self, id: UUID) -> JobEntity:
         async with UnitOfWork().create() as unit_of_work:
             job: JobEntity = await JobDataAccess(session=unit_of_work).get_job_by_id(job_id=id)
             return job
@@ -25,7 +26,7 @@ class JobService:
             return created_job
 
     async def update_job(
-        self, id: int, job_details: dict[str, Any], job_process: JobProcess | None = None
+        self, id: UUID, job_details: dict[str, Any], job_process: JobProcess | None = None
     ) -> JobEntity:
         async with UnitOfWork().create() as unit_of_work:
             job_access_data: JobDataAccess = JobDataAccess(unit_of_work)
@@ -41,7 +42,7 @@ class JobService:
             )
             return updated_job
 
-    async def delete_job_by_id(self, id: int) -> None:
+    async def delete_job_by_id(self, id: UUID) -> None:
         async with UnitOfWork().create() as unit_of_work:
             job_data_access: JobDataAccess = JobDataAccess(session=unit_of_work)
             await job_data_access.get_job_by_id(job_id=id)

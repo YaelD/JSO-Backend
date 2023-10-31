@@ -1,3 +1,4 @@
+import uuid
 from datetime import date
 from typing import Any
 
@@ -34,7 +35,7 @@ class JobReceive(JobBase):
 
 
 class JobSend(JobBase):
-    id: int
+    id: uuid.UUID
     process_steps: list[ProcessStepApiModel]
 
 
