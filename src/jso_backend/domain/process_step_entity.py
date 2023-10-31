@@ -1,33 +1,12 @@
-from typing import Any
+from pydantic import BaseModel, Field
 
 from jso_backend.domain.step_type import StepType
 
 
-class ProcessStepEntity:
-    def __init__(
-        self,
-        name: str,
-        type: StepType = StepType.CUSTOM,
-        is_completed: bool = False,
-    ):
-        self.name = name
-        self.type = type
-        self.is_completed = is_completed
-
-    def to_dict(self):
-        return {
-            "name": self.name,
-            "type": self.type,
-            "is_completed": self.is_completed,
-        }
-
-    @classmethod
-    def from_dict(cls, data: dict[str, Any]):
-        return cls(
-            name=data.get("name", ""),
-            type=data.get("type", StepType.CUSTOM),
-            is_completed=data.get("is_completed", False),
-        )
+class ProcessStepEntity(BaseModel, validate_assignment=True):
+    name: str = Field(min_length=1, max_length=25)
+    type: StepType = StepType.CUSTOM
+    is_completed: bool = False
 
     def __eq__(self, __value: object) -> bool:
         if not isinstance(__value, type(self)):

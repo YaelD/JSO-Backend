@@ -10,7 +10,7 @@ class ProcessStepConverter:
         process_step_entity_list: list[ProcessStepEntity] = []
         for step in dict_process_steps:
             process_step_entity_list.append(ProcessStepEntity(**step.dict()))
-        return JobProcess(process_step_entity_list)
+        return JobProcess(steps_list=process_step_entity_list)
 
     def convert_process_step_entity_to_process_step_api(
         self, process_step_entity_list: list[ProcessStepEntity]

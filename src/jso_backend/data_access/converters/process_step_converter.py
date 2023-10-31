@@ -9,8 +9,8 @@ class ProcessStepDBConverter:
         self, job_process: JobProcess
     ) -> list[dict[str, Any]]:
         dict_process_steps: list[dict[str, Any]] = []
-        for step in job_process.process_steps:
-            dict_process_steps.append(step.to_dict())
+        for step in job_process.steps_list:
+            dict_process_steps.append(step.dict())
         return dict_process_steps
 
     def convert_list_of_dicts_to_process_step_entity_list(
@@ -18,5 +18,5 @@ class ProcessStepDBConverter:
     ) -> list[ProcessStepEntity]:
         process_step_entity_list: list[ProcessStepEntity] = []
         for dict_step in dict_process_steps:
-            process_step_entity_list.append(ProcessStepEntity.from_dict(dict_step))
+            process_step_entity_list.append(ProcessStepEntity(**dict_step))
         return process_step_entity_list

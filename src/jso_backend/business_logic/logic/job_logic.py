@@ -21,14 +21,10 @@ class JobLogic:
     def update_job_status_by_process_step_list(
         self, job_process: JobProcess, curr_job_in_db: JobEntity
     ) -> JobStatus:
-        if (
-            curr_job_in_db.status == JobStatus.PENDING
-            and job_process.process_steps[2].is_completed
-        ):
+        if curr_job_in_db.status == JobStatus.PENDING and job_process.steps_list[2].is_completed:
             return JobStatus.OPEN
         elif (
-            curr_job_in_db.status == JobStatus.OPEN
-            and not job_process.process_steps[2].is_completed
+            curr_job_in_db.status == JobStatus.OPEN and not job_process.steps_list[2].is_completed
         ):
             return JobStatus.PENDING
         return curr_job_in_db.status

@@ -1,28 +1,38 @@
-from datetime import datetime
+from datetime import date
+from typing import Any
+
+from pydantic import BaseModel, Field, root_validator, validator
 
 from jso_backend.domain.job_process import JobProcess
 from jso_backend.domain.job_status_type import JobStatus
 
 
-class JobEntity:
-    def __init__(
-        self,
-        company_name: str,
-        role: str,
-        id: int | None = None,
-        status: JobStatus = JobStatus.PENDING,
-        creation_date: datetime | None = datetime.now(),
-        job_link: str | None = "",
-        about: str | None = "",
-        tech_stack: list[str] = [],
-        process_steps: JobProcess = JobProcess(),
-    ):
-        self.creation_date = creation_date
-        self.company_name = company_name
-        self.role = role
-        self.id = id
-        self.status = status
-        self.job_link = job_link
-        self.about = about
-        self.tech_stack = tech_stack
-        self.process_steps = process_steps
+class JobEntity(BaseModel, validate_assignment=True):
+    company_name: str = Field(min_length=1, max_length=50)
+    role: str = Field(min_length=1, max_length=50)
+    id: int | None = None
+    status: JobStatus = JobStatus.PENDING
+    creation_date: date | None = date.today()
+    job_link: str | None = ""
+    about: str | None = ""
+    tech_stack: list[str] = []
+    process_steps: JobProcess = JobProcess()
+
+    @validator("creation_date")
+    @classmethod
+    def validate_creation_date(cls, value: date) -> date:
+        if value > date.today():
+            raise ValueError("Invalid creation date. Creation date can not be a future date")
+        return value
+
+    @root_validator
+    def validate_process_steps_and_status(cls, values: dict[str, Any]) -> dict[str, Any]:
+        job_process: JobProcess | None = values.get("process_steps")
+        status: JobStatus | None = values.get("status")
+        if not job_process or not status:
+            raise ValueError("Invalid job entity. Job must contain process steps and status")
+        if job_process.steps_list[2].is_completed == True and status == JobStatus.PENDING:
+            raise ValueError("Invalid job status. Job status should be open and not pending")
+        if job_process.steps_list[2].is_completed == False and status == JobStatus.OPEN:
+            raise ValueError("Invalid job status. Job status should be pending and not open")
+        return values
