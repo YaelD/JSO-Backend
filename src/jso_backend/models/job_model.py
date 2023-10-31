@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from typing import Any
 
 from sqlmodel import JSON, Column, Field, Relationship, SQLModel  # type:ignore
@@ -7,7 +7,7 @@ from jso_backend.domain.job_status_type import JobStatus
 
 
 class DBJobModel(SQLModel, table=True):
-    creation_date: datetime | None = datetime.now()
+    creation_date: date | None = date.today()
     company_name: str
     role: str
     status: JobStatus = JobStatus.PENDING

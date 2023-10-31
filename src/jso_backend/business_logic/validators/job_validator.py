@@ -48,16 +48,14 @@ class JobValidator:
 
             case JobStatus.OPEN:
                 if self.job_process:
-                    return True if self.job_process.process_steps[2].is_completed else False
+                    return True if self.job_process.steps_list[2].is_completed else False
                 else:
                     return (
-                        True
-                        if self.job_entity.process_steps.process_steps[2].is_completed
-                        else False
+                        True if self.job_entity.process_steps.steps_list[2].is_completed else False
                     )
 
             case JobStatus.PENDING:
                 if self.job_process:
-                    return True if not self.job_process.process_steps[2].is_completed else False
+                    return True if not self.job_process.steps_list[2].is_completed else False
                 else:
                     return True if self.job_entity.status == JobStatus.PENDING else False

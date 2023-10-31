@@ -18,7 +18,7 @@ class JobDBConverter:
             tech_stack=job.tech_stack,
             id=job.id,
             process_steps=JobProcess(
-                ProcessStepDBConverter().convert_list_of_dicts_to_process_step_entity_list(
+                steps_list=ProcessStepDBConverter().convert_list_of_dicts_to_process_step_entity_list(
                     job.process_steps
                 ),
             ),
