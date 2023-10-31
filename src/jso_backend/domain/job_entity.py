@@ -1,3 +1,4 @@
+import uuid
 from datetime import date
 from typing import Any
 
@@ -10,7 +11,7 @@ from jso_backend.domain.job_status_type import JobStatus
 class JobEntity(BaseModel, validate_assignment=True):
     company_name: str = Field(min_length=1, max_length=50)
     role: str = Field(min_length=1, max_length=50)
-    id: int | None = None
+    id: uuid.UUID = uuid.uuid4()
     status: JobStatus = JobStatus.PENDING
     creation_date: date | None = date.today()
     job_link: str | None = ""

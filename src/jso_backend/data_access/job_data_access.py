@@ -1,4 +1,5 @@
 from typing import Any
+from uuid import UUID
 
 from sqlmodel import Session, select
 
@@ -15,7 +16,7 @@ class JobDataAccess(IJobDataAccess):
     def __init__(self, session: Session) -> None:
         self.db_session = session
 
-    async def get_job_by_id(self, job_id: int) -> JobEntity:
+    async def get_job_by_id(self, job_id: UUID) -> JobEntity:
         db_job: DBJobModel | None = self.db_session.get(DBJobModel, job_id)
         if not db_job:
             raise JobNotFoundError(id=job_id)
@@ -43,7 +44,7 @@ class JobDataAccess(IJobDataAccess):
         job_entity: JobEntity = JobDBConverter().convert_db_job_to_job_entity(db_job)
         return job_entity
 
-    async def update_job(self, job_id: int, job_data: dict[str, Any]) -> JobEntity:
+    async def update_job(self, job_id: UUID, job_data: dict[str, Any]) -> JobEntity:
         db_job: DBJobModel | None = self.db_session.get(DBJobModel, job_id)
         if not db_job:
             raise JobNotFoundError(id=job_id)
@@ -55,7 +56,7 @@ class JobDataAccess(IJobDataAccess):
         updated_job: JobEntity = JobDBConverter().convert_db_job_to_job_entity(db_job)
         return updated_job
 
-    def delete_job(self, job_id: int) -> None:
+    def delete_job(self, job_id: UUID) -> None:
         db_job: DBJobModel | None = self.db_session.get(DBJobModel, job_id)
         if not db_job:
             raise JobNotFoundError(id=job_id)

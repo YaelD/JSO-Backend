@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, HTTPException
 
 from jso_backend.api.converters.job_converter import JobConverter
@@ -22,7 +24,7 @@ async def get_list_of_jobs():
 
 
 @router.get("/{job_id}", response_model=JobSend)
-async def get_job(job_id: int):
+async def get_job(job_id: UUID):
     try:
         job_entity: JobEntity = await JobService().get_job_by_id(id=job_id)
         job: JobSend = JobConverter().from_job_entity_to_job_api(job_entity=job_entity)
@@ -40,7 +42,7 @@ async def create_job(job: JobReceive):
 
 
 @router.patch("/{job_id}", response_model=JobSend)
-async def update_job(job_id: int, job: JobUpdate):
+async def update_job(job_id: UUID, job: JobUpdate):
     try:
         job_process: JobProcess | None = None
         if job.process_steps is not None:
@@ -59,7 +61,7 @@ async def update_job(job_id: int, job: JobUpdate):
 
 
 @router.delete("/{job_id}")
-async def delete_job(job_id: int):
+async def delete_job(job_id: UUID):
     try:
         await JobService().delete_job_by_id(job_id)
     except JobNotFoundError as error:
