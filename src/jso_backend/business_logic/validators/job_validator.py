@@ -7,8 +7,8 @@ from jso_backend.domain.exceptions.invalid_job_details_exception import (
     InvalidJobDetailsError,
 )
 from jso_backend.domain.job_entity import JobEntity
-from jso_backend.domain.job_process import JobProcess
 from jso_backend.domain.job_status_type import JobStatus
+from jso_backend.domain.process_step_entity import ProcessStepEntity
 
 
 class JobValidator:
@@ -16,20 +16,20 @@ class JobValidator:
         self,
         job_entity: JobEntity,
         job_details_to_update: dict[Any, Any],
-        job_process: JobProcess | None = None,
+        process_steps: list[ProcessStepEntity] | None = None,
     ) -> None:
         self.job_entity = job_entity
         self.job_details_to_update = job_details_to_update
-        self.job_process = job_process
+        self.process_steps = process_steps
 
     def validate_job_data_fields(
         self,
     ) -> None:
         self.validate_required_field_is_not_empty("company_name")
         self.validate_required_field_is_not_empty("role")
-        if self.job_process:
+        if self.process_steps:
             if not ProcessStepsValidator().check_is_valid_process_step_list(
-                job_process=self.job_process
+                process_step_list=self.process_steps
             ):
                 raise InvalidJobDetailsError(message="Invalid process steps")
         status: JobStatus | None = self.job_details_to_update.get("status")
@@ -47,15 +47,13 @@ class JobValidator:
                 return True
 
             case JobStatus.OPEN:
-                if self.job_process:
-                    return True if self.job_process.steps_list[2].is_completed else False
+                if self.process_steps:
+                    return True if self.process_steps[2].is_completed else False
                 else:
-                    return (
-                        True if self.job_entity.process_steps.steps_list[2].is_completed else False
-                    )
+                    return True if self.job_entity.process_steps[2].is_completed else False
 
             case JobStatus.PENDING:
-                if self.job_process:
-                    return True if not self.job_process.steps_list[2].is_completed else False
+                if self.process_steps:
+                    return True if not self.process_steps[2].is_completed else False
                 else:
                     return True if self.job_entity.status == JobStatus.PENDING else False

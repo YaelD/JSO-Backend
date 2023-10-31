@@ -11,7 +11,9 @@ from jso_backend.domain.exceptions.invalid_job_details_exception import (
 )
 from jso_backend.domain.exceptions.job_not_found_exception import JobNotFoundError
 from jso_backend.domain.job_entity import JobEntity
-from jso_backend.domain.job_process import JobProcess
+from jso_backend.domain.process_step_entity import ProcessStepEntity
+
+# from jso_backend.domain.job_process import JobProcess
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 
@@ -44,13 +46,17 @@ async def create_job(job: JobReceive):
 @router.patch("/{job_id}", response_model=JobSend)
 async def update_job(job_id: UUID, job: JobUpdate):
     try:
-        job_process: JobProcess | None = None
+        process_steps_to_update: list[ProcessStepEntity] | None = None
         if job.process_steps is not None:
-            job_process = ProcessStepConverter().convert_dict_process_step_list_to_job_process(
-                job.process_steps
+            process_steps_to_update = (
+                ProcessStepConverter().convert_dict_process_step_list_to_job_process(
+                    job.process_steps
+                )
             )
         updated_job: JobEntity = await JobService().update_job(
-            id=job_id, job_details=job.dict(exclude_unset=True), job_process=job_process
+            id=job_id,
+            job_details=job.dict(exclude_unset=True),
+            process_steps=process_steps_to_update,
         )
         job_send: JobSend = JobConverter().from_job_entity_to_job_api(updated_job)
         return job_send

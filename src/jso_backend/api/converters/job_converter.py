@@ -16,8 +16,8 @@ class JobConverter:
             job_link=job_entity.job_link,
             about=job_entity.about,
             tech_stack=job_entity.tech_stack,
-            id=job_entity.id,  # type: ignore
+            id=job_entity.id,
             process_steps=ProcessStepConverter().convert_process_step_entity_to_process_step_api(
-                job_entity.process_steps.steps_list
+                job_entity.process_steps
             ),
         )

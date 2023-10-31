@@ -2,7 +2,6 @@ from jso_backend.data_access.converters.process_step_converter import (
     ProcessStepDBConverter,
 )
 from jso_backend.domain.job_entity import JobEntity
-from jso_backend.domain.job_process import JobProcess
 from jso_backend.models.job_model import DBJobModel
 
 
@@ -17,10 +16,8 @@ class JobDBConverter:
             about=job.about,
             tech_stack=job.tech_stack,
             id=job.id,
-            process_steps=JobProcess(
-                steps_list=ProcessStepDBConverter().convert_list_of_dicts_to_process_step_entity_list(
-                    job.process_steps
-                ),
+            process_steps=ProcessStepDBConverter().convert_list_of_dicts_to_process_step_entity_list(
+                job.process_steps
             ),
         )
 
@@ -34,7 +31,7 @@ class JobDBConverter:
             about=job.about,
             tech_stack=job.tech_stack,
             process_steps=ProcessStepDBConverter().convert_list_of_process_step_entity_to_list_of_dict(
-                job_process=job.process_steps
+                process_steps=job.process_steps
             ),
             id=job.id,
         )

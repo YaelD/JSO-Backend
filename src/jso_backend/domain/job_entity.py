@@ -4,8 +4,15 @@ from typing import Any
 
 from pydantic import BaseModel, Field, root_validator, validator
 
-from jso_backend.domain.job_process import JobProcess
 from jso_backend.domain.job_status_type import JobStatus
+from jso_backend.domain.process_step_entity import ProcessStepEntity
+from jso_backend.domain.step_type import StepType
+
+starting_steps: list[ProcessStepEntity] = [
+    ProcessStepEntity(name=str(StepType.CONNECT), type=StepType.CONNECT),
+    ProcessStepEntity(name=str(StepType.SEND_CV), type=StepType.SEND_CV),
+    ProcessStepEntity(name=str(StepType.APPLIED), type=StepType.APPLIED),
+]
 
 
 class JobEntity(BaseModel, validate_assignment=True):
@@ -17,7 +24,7 @@ class JobEntity(BaseModel, validate_assignment=True):
     job_link: str | None = ""
     about: str | None = ""
     tech_stack: list[str] = []
-    process_steps: JobProcess = JobProcess()
+    process_steps: list[ProcessStepEntity] = starting_steps
 
     @validator("creation_date")
     @classmethod
@@ -28,12 +35,12 @@ class JobEntity(BaseModel, validate_assignment=True):
 
     @root_validator
     def validate_process_steps_and_status(cls, values: dict[str, Any]) -> dict[str, Any]:
-        job_process: JobProcess | None = values.get("process_steps")
+        process_steps: list[ProcessStepEntity] | None = values.get("process_steps")
         status: JobStatus | None = values.get("status")
-        if not job_process or not status:
+        if not process_steps or not status:
             raise ValueError("Invalid job entity. Job must contain process steps and status")
-        if job_process.steps_list[2].is_completed == True and status == JobStatus.PENDING:
+        if process_steps[2].is_completed == True and status == JobStatus.PENDING:
             raise ValueError("Invalid job status. Job status should be open and not pending")
-        if job_process.steps_list[2].is_completed == False and status == JobStatus.OPEN:
+        if process_steps[2].is_completed == False and status == JobStatus.OPEN:
             raise ValueError("Invalid job status. Job status should be pending and not open")
         return values

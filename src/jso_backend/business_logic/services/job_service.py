@@ -6,7 +6,7 @@ from jso_backend.business_logic.validators.job_validator import JobValidator
 from jso_backend.data_access.job_data_access import JobDataAccess
 from jso_backend.data_access.unit_of_work import UnitOfWork
 from jso_backend.domain.job_entity import JobEntity
-from jso_backend.domain.job_process import JobProcess
+from jso_backend.domain.process_step_entity import ProcessStepEntity
 
 
 class JobService:
@@ -26,7 +26,10 @@ class JobService:
             return created_job
 
     async def update_job(
-        self, id: UUID, job_details: dict[str, Any], job_process: JobProcess | None = None
+        self,
+        id: UUID,
+        job_details: dict[str, Any],
+        process_steps: list[ProcessStepEntity] | None = None,
     ) -> JobEntity:
         async with UnitOfWork().create() as unit_of_work:
             job_access_data: JobDataAccess = JobDataAccess(unit_of_work)
@@ -34,9 +37,9 @@ class JobService:
             JobValidator(
                 job_entity=job_to_update,
                 job_details_to_update=job_details,
-                job_process=job_process,
+                process_steps=process_steps,
             ).validate_job_data_fields()
-            JobLogic().update_job_details(job_to_update, job_details, job_process)
+            JobLogic().update_job_details(job_to_update, job_details, process_steps)
             updated_job: JobEntity = await job_access_data.update_job(
                 job_id=id, job_data=job_details
             )

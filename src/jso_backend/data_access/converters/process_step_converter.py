@@ -1,15 +1,14 @@
 from typing import Any
 
-from jso_backend.domain.job_process import JobProcess
 from jso_backend.domain.process_step_entity import ProcessStepEntity
 
 
 class ProcessStepDBConverter:
     def convert_list_of_process_step_entity_to_list_of_dict(
-        self, job_process: JobProcess
+        self, process_steps: list[ProcessStepEntity]
     ) -> list[dict[str, Any]]:
         dict_process_steps: list[dict[str, Any]] = []
-        for step in job_process.steps_list:
+        for step in process_steps:
             dict_process_steps.append(step.dict())
         return dict_process_steps
 
