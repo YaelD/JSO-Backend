@@ -2,6 +2,7 @@
 
 # JSO - Job Seeking Organizer (Backend)
 This repository contains the JSO platform server.
+
 JSO is a job-seeker platform designed to help users to organize and manage their job-seeking processes.
 
 ## Technological stack
