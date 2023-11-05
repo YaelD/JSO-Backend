@@ -1,8 +1,8 @@
 ![JSO](https://github.com/YaelD/JSO-Frontend/assets/63968945/f9d9e5ea-300d-439a-9c3a-98e9afb94181)
 
 # JSO - Job Seeking Organizer (Backend)
-This repository contains the backend app of the JSO platform.
-JSO is an open-source platform for job seekers that helps users to organize and manage their job-seeking processes.
+This repository contains the JSO platform server.
+JSO is a job-seeker platform designed to help users to organize and manage their job-seeking processes.
 
 ## Technological stack
 - Python
